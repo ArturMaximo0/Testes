@@ -13,6 +13,7 @@ escolha1 =input("para escolher a opcão 1 digite: 1 para escolher a opcão 2 dig
 if escolha1 == '1':
   print("Você encontra Mahari,sua melhor amiga desde a infancia.")
   print("mahari - Oi! quanto tempo "+ nome)
+
 #não falar com a mahari
 if escolha1 == '2':
   print ("Você vai para a escola sozinha.")
