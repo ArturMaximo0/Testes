@@ -21,4 +21,4 @@ if opr == 4:
     print(num1 / num2)
 
 if opr == 5:
-    print(num1 ** num1)
+    print(num1 ** num2)
