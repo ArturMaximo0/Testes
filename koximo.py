@@ -17,3 +17,4 @@ if escolha1 == '1':
 #não falar com a mahari
 if escolha1 == '2':
   print ("Você vai para a escola sozinha.")
+  
