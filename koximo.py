@@ -9,6 +9,7 @@ print ("Seu despertador toca, você acorda e coloca seu uniforme, desce para a c
 print ("No caminho você encontra sua melhor amiga Mahari")
 print ("Oque você faz? (Opcão 1: Ir falar com ela e ir pra escola com ela, opcão 2: Fingir não viu ela  e seguir se caminho.)")
 escolha1 =input("para escolher a opcão 1 digite: 1 para escolher a opcão 2 digite:2 :")
+
 #falar com a mahari
 if escolha1 == '1':
   print("Você encontra Mahari,sua melhor amiga desde a infancia.")
@@ -17,4 +18,4 @@ if escolha1 == '1':
 #não falar com a mahari
 if escolha1 == '2':
   print ("Você vai para a escola sozinha.")
-  
+  print ("seguindo o caminho da escola você entra em um beco para cortar caminho, la vc se depara com um homem usando roupas escuras, com medo vc tenta dar meia volta mas tem outro homem atras de você eles começam a se aproximar de você, não tem para onde fugir você se abaixa gritando por socorro")
