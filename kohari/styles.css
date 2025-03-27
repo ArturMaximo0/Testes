@@ -1,0 +1,44 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.coracao {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    transform: rotate(-45deg);
+    margin: 50px;
+}
+
+.coracao::before,
+.coracao::after {
+    content: "";
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    border-radius: 50%;
+}
+
+.coracao::before {
+    top: -50px;
+    left: 0;
+}
+
+.coracao::after {
+    left: 50px;
+    top: 0;
+}
+ 
+html {
+    min-height: 100%;
+    background-image: url(IMG_20240627_091135471.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+ }
+ 

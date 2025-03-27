@@ -1,5 +1,5 @@
 print('*************')
-print("*CALCULADORA*")
+print("*CALCULADORA teste*")
 print('*************')
 
 num1 = int(input("primeiro número:"))
