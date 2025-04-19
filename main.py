@@ -1,6 +1,6 @@
-import sla
+import func
 
-lista_c, lista_d = sla.criptografar()
+lista_c, lista_d = func.criptografar()
 
 print ("senhas criptografadas:")
 print ("**************************************************************************************************************************")
