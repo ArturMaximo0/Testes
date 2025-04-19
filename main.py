@@ -1,17 +1,15 @@
-import teste
-from teste import criptografar as cripF
+import sla
 
-crip, dcrip = teste.criptografar()
-
+lista_c, lista_d = sla.criptografar()
 
 print ("senhas criptografadas:")
 print ("**************************************************************************************************************************")
-print (crip)
+print (lista_c)
 print ("**************************************************************************************************************************")
 
 print ("senhas descriptografadas:")
 print ("**************************************************************************************************************************")
-print (dcrip)
+print (lista_d)
 print ("**************************************************************************************************************************")
 
 input("pressione enter para continuar")

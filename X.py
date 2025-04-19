@@ -1,4 +1,4 @@
-from Cad_Log import cl  # Certifique-se de que o nome do arquivo está correto
+from func import cl  # Certifique-se de que o nome do arquivo está correto
 import random
 
 def gerar_numero_aleatorio(minimo, maximo):
