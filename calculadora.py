@@ -4,21 +4,21 @@ print('*************')
 
 num1 = int(input("primeiro número:"))
 print("")
-opr = int(input("Soma = 1, subtração = 2, multplicação = 3, divisão = 4, elevado = 5:"))
+opr = input("soma = + subtração = - multiplicação = * divisão = / potência = **\nEscolha a operação:")
 print("")
 num2: int = int(input("segundo número:"))
 
-if opr == 1:
+if opr == "+":
     print(num1 + num2)
 
-if opr == 2:
+if opr == "-":
     print(num1 - num2)
 
-if opr == 3:
+if opr == "*":
     print(num1 * num2)
 
-if opr == 4:
+if opr == "/":
     print(num1 / num2)
 
-if opr == 5:
+if opr == "**":
     print(num1 ** num2)
