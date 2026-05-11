@@ -1,0 +1,325 @@
+package artur;
+
+import robocode.*;
+import java.awt.*;
+
+import static robocode.util.Utils.normalRelativeAngleDegrees;
+
+public class KillerBot extends AdvancedRobot {
+
+    // ===== ALVO =====
+    String targetName = "";
+    double targetDistance = 9999;
+
+    // ===== MOVIMENTO =====
+    int moveDirection = 1;
+
+    // ===== PRESSÃO =====
+    int damageTakenRecently = 0;
+
+    public void run() {
+
+        // ===== CORES =====
+        setBodyColor(Color.black);
+        setGunColor(Color.red);
+        setRadarColor(Color.orange);
+        setBulletColor(Color.cyan);
+        setScanColor(Color.white);
+
+        // ===== SISTEMAS INDEPENDENTES =====
+        setAdjustRadarForRobotTurn(true);
+        setAdjustRadarForGunTurn(true);
+        setAdjustGunForRobotTurn(true);
+
+        // ===== RADAR INFINITO =====
+        setTurnRadarRight(Double.POSITIVE_INFINITY);
+
+        // ===== MOVE CONSTANTE =====
+        setAhead(10000);
+
+        while (true) {
+
+            // ===== NUNCA PARAR =====
+            if (getDistanceRemaining() == 0) {
+
+                moveDirection *= -1;
+
+                setAhead(10000 * moveDirection);
+            }
+
+            // ===== FUGIR DA PAREDE =====
+            avoidWalls();
+
+            // ===== RESET PRESSÃO =====
+            if (damageTakenRecently > 0) {
+                damageTakenRecently--;
+            }
+
+            execute();
+        }
+    }
+
+    // =========================================================
+    // SCAN
+    // =========================================================
+
+    public void onScannedRobot(ScannedRobotEvent e) {
+
+        // ===== ESCOLHA SIMPLES DE ALVO =====
+
+        boolean changeTarget = false;
+
+        // Sem alvo
+        if (targetName.equals("")) {
+            changeTarget = true;
+        }
+
+        // Alvo morreu/trocou
+        else if (e.getDistance() < targetDistance - 120) {
+            changeTarget = true;
+        }
+
+        // Alvo parado = free kill
+        else if (Math.abs(e.getVelocity()) < 1.2
+                && e.getDistance() < 250) {
+
+            changeTarget = true;
+        }
+
+        if (changeTarget) {
+
+            targetName = e.getName();
+            targetDistance = e.getDistance();
+        }
+
+        // ===== IGNORA OUTROS =====
+        if (!e.getName().equals(targetName)) {
+            return;
+        }
+
+        targetDistance = e.getDistance();
+
+        // =====================================================
+        // RADAR LOCK
+        // =====================================================
+
+        double radarTurn =
+                getHeadingRadians()
+                + e.getBearingRadians()
+                - getRadarHeadingRadians();
+
+        setTurnRadarRightRadians(radarTurn * 2);
+
+        // =====================================================
+        // MOVIMENTO
+        // =====================================================
+
+        // Movimento lateral constante
+        setTurnRight(e.getBearing() + 90);
+
+        // Troca direção ocasionalmente
+        if (Math.random() > 0.93) {
+
+            moveDirection *= -1;
+
+            setAhead(10000 * moveDirection);
+        }
+
+        // =====================================================
+        // FUGA SOB PRESSÃO
+        // =====================================================
+
+        if (damageTakenRecently >= 3) {
+
+            moveDirection *= -1;
+
+            setTurnRight(e.getBearing() + 120);
+
+            setAhead(250 * moveDirection);
+
+            damageTakenRecently = 0;
+        }
+
+        // =====================================================
+        // MIRA SIMPLES E ESTÁVEL
+        // =====================================================
+
+        double bulletPower;
+
+        if (e.getDistance() < 120) {
+            bulletPower = 3;
+        }
+        else if (e.getDistance() < 300) {
+            bulletPower = 2.4;
+        }
+        else {
+            bulletPower = 1.7;
+        }
+
+        double absoluteBearing =
+                getHeadingRadians()
+                + e.getBearingRadians();
+
+        double enemyX =
+                getX()
+                + Math.sin(absoluteBearing)
+                * e.getDistance();
+
+        double enemyY =
+                getY()
+                + Math.cos(absoluteBearing)
+                * e.getDistance();
+
+        double bulletSpeed =
+                20 - (3 * bulletPower);
+
+        double time =
+                e.getDistance() / bulletSpeed;
+
+        // Predição LEVE
+        double futureX =
+                enemyX
+                + Math.sin(e.getHeadingRadians())
+                * e.getVelocity()
+                * time;
+
+        double futureY =
+                enemyY
+                + Math.cos(e.getHeadingRadians())
+                * e.getVelocity()
+                * time;
+
+        // Não mirar fora da arena
+        futureX = Math.max(
+                40,
+                Math.min(
+                        getBattleFieldWidth() - 40,
+                        futureX
+                )
+        );
+
+        futureY = Math.max(
+                40,
+                Math.min(
+                        getBattleFieldHeight() - 40,
+                        futureY
+                )
+        );
+
+        double theta =
+                Math.toDegrees(
+                        Math.atan2(
+                                futureX - getX(),
+                                futureY - getY()
+                        )
+                );
+
+        double gunTurn =
+                normalRelativeAngleDegrees(
+                        theta - getGunHeading()
+                );
+
+        setTurnGunRight(gunTurn);
+
+        // =====================================================
+        // TIRO CONSTANTE
+        // =====================================================
+
+        if (getGunHeat() == 0
+                && Math.abs(getGunTurnRemaining()) < 12) {
+
+            fire(bulletPower);
+        }
+    }
+
+    // =========================================================
+    // TOMOU TIRO
+    // =========================================================
+
+    public void onHitByBullet(HitByBulletEvent e) {
+
+        damageTakenRecently++;
+
+        // Revida perto
+        if (e.getPower() > 2) {
+
+            moveDirection *= -1;
+
+            setTurnRight(e.getBearing() + 90);
+
+            setAhead(180 * moveDirection);
+        }
+    }
+
+    // =========================================================
+    // COLISÃO ROBÔ
+    // =========================================================
+
+    public void onHitRobot(HitRobotEvent e) {
+
+        // COLADO = MATA
+        targetName = e.getName();
+
+        setTurnGunRight(
+                normalRelativeAngleDegrees(
+                        getHeading()
+                        + e.getBearing()
+                        - getGunHeading()
+                )
+        );
+
+        fire(3);
+
+        moveDirection *= -1;
+
+        setBack(120);
+    }
+
+    // =========================================================
+    // PAREDE
+    // =========================================================
+
+    public void onHitWall(HitWallEvent e) {
+
+        moveDirection *= -1;
+
+        setBack(200);
+
+        setTurnRight(120);
+    }
+
+    // =========================================================
+    // ANTI PAREDE
+    // =========================================================
+
+    private void avoidWalls() {
+
+        double margin = 80;
+
+        boolean nearWall =
+                getX() < margin
+                || getY() < margin
+                || getX() > getBattleFieldWidth() - margin
+                || getY() > getBattleFieldHeight() - margin;
+
+        if (nearWall) {
+
+            setTurnRight(60);
+
+            setAhead(180 * moveDirection);
+        }
+    }
+
+    // =========================================================
+    // ALVO MORREU
+    // =========================================================
+
+    public void onRobotDeath(RobotDeathEvent e) {
+
+        if (e.getName().equals(targetName)) {
+
+            targetName = "";
+            targetDistance = 9999;
+        }
+    }
+}
